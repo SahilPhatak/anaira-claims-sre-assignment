@@ -1,0 +1,17 @@
+# Node
+node_modules/
+
+# Terraform
+.terraform/
+terraform.tfstate
+terraform.tfstate.backup
+
+# LocalStack
+localstack-data/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
