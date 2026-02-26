@@ -5,3 +5,10 @@
 - Node.js application created
 - Memory leak observed using `/process-claim`
 - Git repository initialized
+
+Further phases will include:
+- Docker & Observability
+- Kubernetes orchestration
+- Terraform (IaC)
+- Kafka event streaming
+- Chaos engineering
