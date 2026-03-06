@@ -1,6 +1,8 @@
-System Architecture
+# System Architecture
+# Architecture Diagram
 ![System Architecture](<Architecture.drawio (1).png>)
 
+# Phase Progression
 • Phase 1 – Observability Stack
 
 In the first phase an observability stack was deployed using Docker Compose.  
@@ -24,13 +26,13 @@ Chaos engineering experiments were performed using LitmusChaos to validate the r
 Experiments such as pod deletion, CPU stress, and network latency were introduced to test the system's behavior under failure conditions.Kyverno was used as a policy engine to enforce Kubernetes governance policies such as mandatory labels and security controls.
 
 
-• Data Flow
+# Data Flow
 
 The data flow of the system begins when a client sends an HTTP POST request to the `/process-claim` endpoint.The request enters the Kubernetes cluster through the Ingress controller and is routed to the Claims Processor API service.The API processes the claim request and publishes an event to a Kafka topic using the Kafka producer.Kafka acts as the event streaming backbone of the architecture, allowing asynchronous processing and decoupling between services.A consumer processes the event and stores the resulting data in LocalStack S3, which emulates AWS S3 storage for local development.
 
 This architecture ensures scalability, reliability, and asynchronous processing of claim events.
 
-• Multi-Account AWS Mapping
+# Multi-Account AWS Mapping
 
 In a production environment this architecture would run on AWS using managed services.The local Kind Kubernetes cluster used in this assignment would be replaced with Amazon EKS for production workloads.Kafka deployed via Strimzi would be replaced with Amazon MSK for managed Kafka event streaming.LocalStack S3 used for local development would be replaced with Amazon S3 for durable object storage.
 Infrastructure would typically be provisioned using Terraform across multiple AWS accounts such as development, staging, and production.This multi-account strategy improves security isolation, governance, and deployment control across environments.

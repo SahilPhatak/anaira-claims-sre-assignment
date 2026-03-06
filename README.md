@@ -69,14 +69,11 @@ make test-load
 
 This command continuously sends requests to the claims processing API and helps trigger autoscaling and observability metrics.
 
-Clean Teardown
-
 To stop and remove all resources run:
 
 make clean
 
 This will:
-
 • stop Docker containers  
 • delete Kubernetes resources  
 • clean up the local environment
