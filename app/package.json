@@ -1,12 +1,1 @@
-{
-"name": "anaira-claims-processor",
-"version": "1.0.0",
-"description": "AI Claims Processing Service (Prototype)",
-"main": "app.js",
-"scripts": {
-"start": "node app.js"
-},
-"dependencies": {
-"express": "^4.18.2"
-}
-}
+{"name":"anaira-claims-processor","version":"1.0.0","description":"AI Claims Processing Service (Prototype)","main":"app.js","scripts":{"start":"node app.js"},"dependencies":{"express":"^4.18.2","kafkajs":"^2.2.4","prom-client":"^15.1.3"}}

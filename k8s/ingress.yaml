@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: claims-processor-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: anaira.local
+    http:
+      paths:
+      - path: /process-claim
+        pathType: Prefix
+        backend:
+          service:
+            name: claims-processor
+            port:
+              number: 3000

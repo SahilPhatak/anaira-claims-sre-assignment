@@ -1,0 +1,21 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-compliance-labels
+spec:
+  validationFailureAction: Enforce
+  rules:
+    - name: check-pii-label
+      match:
+        resources:
+          kinds:
+            - Pod
+          namespaces:
+            - default
+      validate:
+        message: "All pods must have 'data-classification' and 'compliance' labels"
+        pattern:
+          metadata:
+            labels:
+              data-classification: "?*"
+              compliance: "irdai"

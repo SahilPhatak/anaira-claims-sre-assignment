@@ -1,0 +1,23 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: claim-submitted
+  namespace: kafka
+  labels:
+    strimzi.io/cluster: anaira-kafka
+spec:
+  partitions: 3
+  replicas: 1
+  config:
+    retention.ms: 604800000
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: claim-processed
+  namespace: kafka
+  labels:
+    strimzi.io/cluster: anaira-kafka
+spec:
+  partitions: 3
+  replicas: 1

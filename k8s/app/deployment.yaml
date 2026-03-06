@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: claims-processor
+  labels:
+    app: claims-processor
+    env: dev
+    data-classification: pii
+    compliance: irdai
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: claims-processor
+  template:
+    metadata:
+      labels:
+        app: claims-processor
+        env: dev
+        data-classification: pii
+        compliance: irdai
+    spec:
+      containers:
+        - name: claims-processor
+          image: claims-processor:v1
+          ports:
+            - containerPort: 3000
+
+          envFrom:
+            - configMapRef:
+                name: aws-config
+
+          env:
+            - name: KAFKA_BROKER
+              value: anaira-kafka-kafka-bootstrap.kafka:9092
+
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false

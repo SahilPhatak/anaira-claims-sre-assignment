@@ -15,3 +15,10 @@ localstack-data/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Loki Data
+loki-data/
+
+# Localstack
+localstack-data/
+

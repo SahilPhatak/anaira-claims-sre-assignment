@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aws-config
+data:
+  AWS_ENDPOINT: "http://localstack:4566"
+  S3_BUCKET: "anaira-claims-archive-prod"
+  SQS_QUEUE_URL: "http://localstack:4566/000000000000/priority-claims-queue"

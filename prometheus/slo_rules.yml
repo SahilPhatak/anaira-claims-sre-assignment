@@ -1,0 +1,14 @@
+groups:
+  - name: slo_alerts
+    interval: 30s
+    rules:
+      - alert: SLOBreach
+        expr: |
+          (
+            sum(rate(http_request_duration_seconds_bucket{le="2"}[1m]))
+            /
+            sum(rate(http_request_duration_seconds_count[1m]))
+          ) < 0.995
+        for: 5m
+        annotations:
+          summary: "SLO breach: <99.5% requests under 2s"
