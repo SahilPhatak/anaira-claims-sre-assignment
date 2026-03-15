@@ -1,19 +1,18 @@
 apiVersion: networking.k8s.io/v1
-kind: Ingress
+kind: NetworkPolicy
 metadata:
-  name: claims-processor-ingress
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
+  name: claims-processor-policy
 spec:
-  ingressClassName: nginx
-  rules:
-  - host: anaira.local
-    http:
-      paths:
-      - path: /process-claim
-        pathType: Prefix
-        backend:
-          service:
-            name: claims-processor
-            port:
-              number: 3000
+  podSelector:
+    matchLabels:
+      app: claims-processor
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 3000

@@ -15,4 +15,3 @@ COPY --from=builder /app /app
 USER nodeuser
 EXPOSE 3000
 CMD ["node", "app.js"]
-

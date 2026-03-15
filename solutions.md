@@ -8,7 +8,7 @@ The objective of this assignment was to demonstrate:
 • Observability-driven debugging 
 • Chaos engineering experiments
 • Site Reliability Engineering (SRE) practices
-1
+
 • Section 1 – Phase Evidence (Screenshots)
 This section contains evidence collected during each phase of the assignment.
 
@@ -90,31 +90,40 @@ Question:
 Why does the Node.js process crash at exactly 256MB? Why doesn't Kubernetes memory limit help here in Docker Compose? What's the difference between docker run --memory and Kubernetes resource limits?
 
 Answer:
-The Node.js service crashes at 256MB because the container has a memory limit set in Docker Compose. The application keeps storing large arrays in memory, so the heap keeps growing until it reaches the limit. When that happens, the container gets killed due to an Out Of Memory (OOM) condition.In Docker Compose the container runtime directly kills the process when the limit is hit. Kubernetes works differently because it uses resource requests and limits together with orchestration. If a container crashes in Kubernetes, the pod is automatically restarted, which improves reliability.
+The Node.js service crashes at 256MB because the container has a memory limit set in Docker Compose. As the application keeps large arrays in memory, so the heap keeps growing until it reaches the limit. When that happens, the container eventually exceeds the limit and the linux OOM   i.e.(Out Of Memory) killer terminates the process.
+Kubernetes memory limits do not apply in Docker Compose because Docker Compose does not use kubernetes resource management.Kubernetes runs inside a cluster and enforces memory using requests and limits,while Docker Compose only applies container-level limits. 
+The main difference is that docker run --memory only sets a maximum memory limit for a container, whereas Kubernetes resource limits include memory requests for scheduling, limits for maximum usage, and automatic pod restart if the container is killed. 
 
 Phase 2 — Kubernetes SRE Practices
 
 Question:
-In production at Anaira (AWS EKS), we use a multi-account setup (Dev/UAT/Prod). How would you modify this K8s setup to represent separate accounts? Would you use namespaces, separate clusters, or both?
+In production at Anaira (AWS EKS), we use a multi-account setup (Dev/UAT/Prod). How would you modify this K8s setup to represent separate accounts? Would you use namespaces, separate clusters, or both?What's the trade-off for insurance compliance (IRDAI audit trails)
 
 Answer:
-In production, I would use separate AWS accounts and separate EKS clusters for Dev, UAT, and Production. This provides strong isolation and helps with compliance and auditing.Namespaces can still be used inside each cluster for organizing services,but namespaces alone are not enough for strict environments like insurance systems where security and audit trails are important.
+Since it is already said that the production uses seperate AWS accounts for Dev,UAT and Prod,I would keep seperate EKS clusters in each account.So it reduces the risk of issues in Dev or UAT affecting production.
+Within each clusters, i would still like to use kubernetes namespaces to organize applications,teams etc.
+The trade-off is that multiple accounts and clusters increase operational complexity and cost,but they also provide security,compliance and reliability which is important for regulated industries like insurance.
+
 
 Phase 3 — Cloud-Native IaC + Event Streaming
 
 Question:
-How would you structure Terraform to deploy resources across multiple AWS accounts? What is the risk of using a single state file?
-
+"In our production AWS setup, we have separate accounts for Dev/UAT/Prod, each with its own VPC. How would you structure Terraform to deploy this same S3 bucket across 3 accounts using Terraform workspaces or separate state files? What's the risk if we use a single state file for multi-account deployments?"
 Answer:
-I would keep separate Terraform state files for each environment (Dev, UAT, Prod). Each environment would have its own backend configuration and AWS account credentials.Using a single state file is risky because a mistake could accidentally modify or delete production resources. Separate state files keep environments isolated and safer to manage.
+Since Dev,UAT and Prod are in separate AWS accounts,I would structure Terraform so that each environment has its own state file.This can be done using Terraform workspaces for each account.So each environment would use different AWS credentials and its own remote state.The same terraform module for the s3 bucket can be reused but it will be deployed separately in each account.
+The risk of using a single state file for multiple accounts is that terraform may track resources from all environments together.This can cause changes or deletions in wrong account.Keeping separate state files per account is safer and aligns better with productions and compliance practices.
 
 Phase 4 — Chaos Engineering & SRE Validation
 
 Question:
-What AWS service would replace Litmus for chaos testing? Compare AWS FIS, Gremlin, and Litmus.
+"In production, what AWS service would replace Litmus for chaos testing? Compare AWS FIS (Fault Injection Simulator) vs Gremlin vs Litmus. Which would you recommend for insurance workloads where downtime directly impacts claim payouts?"
 
 Answer:
-AWS Fault Injection Simulator (FIS) is the native AWS tool for chaos testing. It integrates well with AWS services and IAM.Gremlin is a commercial chaos engineering platform with advanced experiment controls. Litmus is an open-source tool mainly used for Kubernetes clusters.For production insurance workloads, I would recommend AWS FIS because it integrates directly with AWS infrastructure and is safer for regulated environments.
+In production, AWS Fault Injection Simulator (FIS) would be the best AWS service to replace Litmus for chaos testing.
+Litmus is open source and works well with Kubernetes, but it requires more setup and management.
+Gremlin is a commercial chaos engineering platform with advanced features and good observability, but it adds extra cost and external dependency.
+AWS FIS integrates natively with AWS services, IAM, CloudWatch, and EKS, making it easier to control and audit experiments.
+For insurance workloads, where downtime can directly affect claim payouts, I would recommend AWS FIS. It provides controlled experiments, strong IAM permissions and better integration with AWS monitoring and logging which helps support compliance requirements.
 
 • Section 4 - Production Migration Plan
 

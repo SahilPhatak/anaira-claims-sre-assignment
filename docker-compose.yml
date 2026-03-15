@@ -15,18 +15,18 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - /:/rootfs:ro
-      - /var/run:/var/run:ro
-      - /sys:/sys:ro
-      - /var/lib/docker/:/var/lib/docker:ro
+      - /:/rootfs:ro   # Gives container access to host filesystem (read-only)
+      - /var/run:/var/run:ro # Access to Docker runtime socket
+      - /sys:/sys:ro  # Access to system metrics like CPU, memory, etc.
+      - /var/lib/docker/:/var/lib/docker:ro  # Access to Docker container data
     restart: unless-stopped
   
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
     volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-      - ./prometheus/slo_rules.yml:/etc/prometheus/slo_rules.yml
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml # Mounts Prometheus configuration file
+      - ./prometheus/slo_rules.yml:/etc/prometheus/slo_rules.yml   # Mounts SLO alert rules
     ports:
       - "9090:9090"
     depends_on:
@@ -40,8 +40,8 @@ services:
     ports:
       - "3001:3000"
     volumes:
-          - ./grafana/provisioning:/etc/grafana/provisioning
-          - ./grafana/dashboards:/var/lib/grafana/dashboards
+          - ./grafana/provisioning:/etc/grafana/provisioning # Automatically  loads data sources and dashboards from the provisioning directory
+          - ./grafana/dashboards:/var/lib/grafana/dashboards # Mounts custom dashboards like(heap memory,restart count,latency, error rates, etc.)
     depends_on:
       - prometheus
     restart : unless-stopped
@@ -52,23 +52,23 @@ services:
     ports:
       - "3100:3100"
     volumes:
-      - ./loki-config.yaml:/etc/loki/loki-config.yaml
-      - ./loki-data:/loki
-    command: -config.file=/etc/loki/loki-config.yaml
+      - ./loki-config.yaml:/etc/loki/loki-config.yaml # Mounts Loki configuration file
+      - ./loki-data:/loki # Persistent storage for Loki logs
+    command: -config.file=/etc/loki/loki-config.yaml # Specifies the path to the Loki configuration file to use when the container starts
     restart: unless-stopped
   
 
   promtail:
    image: grafana/promtail:latest
    container_name: promtail
-   user: root
+   user: root # Runs as root so it can access Docker logs 
    environment:
      - DOCKER_API_VERSION=1.44
    volumes:
-    - /var/run/docker.sock:/var/run/docker.sock
-    - /var/lib/docker/containers:/var/lib/docker/containers:ro
-    - ./promtail-config.yaml:/etc/promtail/promtail.yaml
-   command: -config.file=/etc/promtail/promtail.yaml
+    - /var/run/docker.sock:/var/run/docker.sock # allows promtail to read Docker container logs 
+    - /var/lib/docker/containers:/var/lib/docker/containers:ro # Access to Docker container logs (read-only)
+    - ./promtail-config.yaml:/etc/promtail/promtail.yaml # Mounts Promtail configuration file
+   command: -config.file=/etc/promtail/promtail.yaml # Starts promtail using that configuration file
    depends_on:
     - loki
    restart: unless-stopped

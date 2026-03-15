@@ -27,7 +27,8 @@ docker --version
 kubectl version --client  
 helm version  
 node -v  
-make --version  
+make --version
+
 
 2) One-Command Setup
 
